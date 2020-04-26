@@ -16,9 +16,9 @@
           "Light Map": lightmap
         };
       
-        // Create an overlayMaps object to hold the bikeStations layer
+        // Create an overlayMaps object to hold the earthquakes layer
         var overlayMaps = {
-          "Earthquakes 4.5+ Magnitude": earthquakes
+          "Earthquake Magnitude": earthquakes
         };
       
         // Create the map object with options
@@ -52,19 +52,49 @@
             var place = earthquakes[index].properties.place;
 
       
-         // For each station, create a marker and bind a popup with the station's name
-        var quake_marker = L.marker([lat, long])
-         .bindPopup("<h3>" + place + "<h3><h3>Magnitude: " + mag + "</h3>");
-      
-        //   // Add the marker to the bikeMarkers array
-         quake_markers.push(quake_marker);
+        
+            //circle radius size calculated based on magnitude
+            var circle_size = mag*10000;
+            
+            //assign a color (with the help of https://colorbrewer2.org/) based on magnitude value. Colors are darker for larger magnitudes
+            var color = '';
+
+            if (mag >= 5) {
+                color = '#993404';
+            } else if (mag >= 4 ) {
+                color = '#d95f0e';
+            } else if (mag >= 3) {
+                color = '#fe9929';
+            } else if (mag >= 2) {
+                color = '#fec44f';
+            } else if (mag >= 1) {
+                color = '#fee391';
+            } else {
+                color = '#ffffd4'
+            }
+
+            //add a circle for the earthquke that's size and color are based off of the magnitude.
+            //bind the circle to a popup that displays the location name and mah=gnitude
+            var quake_marker = L.circle([lat, long], {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.5,
+                radius: circle_size
+
+            })
+            .bindPopup("<h3>" + place + "<h3><h3>Magnitude: " + mag + "</h3>");
+
+
+       
+        // Add the circle to the quake_markers array
+            quake_markers.push(quake_marker);
         }
       
-        // Create a layer group made from the bike markers array, pass it into the createMap function
+        // Create a layer group made from the quake marker array, pass it into the createMap function
         createMap(L.layerGroup(quake_markers));
       }
       
       
-      // Perform an API call to the Citi Bike API to get station information. Call createMarkers when complete
-      d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson", createMarkers);
+      // Perform an API call to the USGS API to get earthqake geojson information. Call createMarkers when complete
+      d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson", createMarkers);
       
