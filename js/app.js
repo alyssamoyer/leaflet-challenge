@@ -23,7 +23,7 @@
       
         // Create the map object with options
         var map = L.map("map-id", {
-          center: [40.52, -34.34],
+          center: [39.5501, -105.7821],
           zoom: 4,
           layers: [lightmap, earthquakes]
         });
@@ -32,7 +32,42 @@
         L.control.layers(baseMaps, overlayMaps, {
           collapsed: false
         }).addTo(map);
+
+        //used to add colors to the legend
+        function legendColor(d) {
+            return d > 5 ? '#993404' :
+                   d > 4  ? '#d95f0e' :
+                   d > 3  ? '#fe9929' :
+                   d > 2  ? '#fec44f' :
+                   d > 1  ? '#fee391' :
+                            '#ffffd4';
+                    
+                 
+        }
+        
+        //add a legend that displays magnitude ranges and their associated color
+        var legend = L.control({position: 'bottomright'});
+    
+        legend.onAdd = function (map) {
+    
+            var div = L.DomUtil.create('div', 'info legend'),
+                mag_range = [0, 1, 2, 3, 4, 5],
+                labels = [];
+    
+        // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < mag_range.length; i++) {
+             div.innerHTML +=
+                    '<i style="background:' + legendColor(mag_range[i] + 1) + '"></i> ' +
+                    mag_range[i] + (mag_range[i + 1] ? '&ndash;' + mag_range[i + 1] + '<br>' : '+');
+        }
+    
+            return div;
+    };
+    //add legend to map
+    legend.addTo(map);
       }
+
+    
       
       function createMarkers(response) {
       
